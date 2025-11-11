@@ -259,4 +259,49 @@ public class Nodo
     }//calculaMalColocadas
 
 
+
+    /// <summary>
+    /// Calcula la heurística de Distancia Manhattan (H2).
+    /// Suma la distancia horizontal y vertical de cada pieza a su posición meta.
+    /// Almacena el resultado en 'this.Heuristica'.
+    /// </summary>
+    public void calculaManhattan()
+    {
+        int distanciaTotal = 0;
+
+        for (int i_actual = 0; i_actual < 3; i_actual++) // Fila actual
+        {
+            for (int j_actual = 0; j_actual < 3; j_actual++) // Columna actual
+            {
+                int valorPieza = this.nodo[i_actual, j_actual];
+
+                // Ignoramos el hueco (el '0')
+                if (valorPieza == 0) continue;
+
+                // Calculamos la posición meta (i_meta, j_meta) del valor 'valorPieza'
+                if (valorPieza >= 1 && valorPieza <= 8)
+                {
+                    // El valor '1' está en el índice 0, el '2' en el 1, etc.
+                    int indicePlano = valorPieza - 1;
+
+                    int i_meta = indicePlano / 3;    // Fila meta
+                    int j_meta = indicePlano % 3;    // Columna meta
+
+                    // 2. Calcular la Distancia Manhattan
+                    // Distancia = |Fila actual - Fila meta| + |Columna actual - Columna meta|
+                    int distanciaFila = Math.Abs(i_actual - i_meta);
+                    int distanciaColumna = Math.Abs(j_actual - j_meta);
+
+                    distanciaTotal += (distanciaFila + distanciaColumna);
+                }
+            }
+        }
+
+        // Almacenar el resultado en la propiedad Heuristica
+        this.Heuristica = distanciaTotal;
+    }
+
+
+
+
 }//Nodo 

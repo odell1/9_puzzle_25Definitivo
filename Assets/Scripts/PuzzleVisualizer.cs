@@ -67,8 +67,8 @@ public class PuzzleVisualizer : MonoBehaviour
 
 
 
-            nodoTemporal.hijos.Clear(); // Limpiamos la lista de hijos antes de expandir
-            nodoTemporal.Expandir();    // Esto puebla nodoTemporal.hijos
+            nodoTemporal.hijos.Clear(); //Limpiamos la lista de hijos antes de expandir
+            nodoTemporal.Expandir();    // nodoTemporal.hijos
 
             if (nodoTemporal.hijos.Count == 0)
             {
@@ -128,6 +128,12 @@ public class PuzzleVisualizer : MonoBehaviour
                 break;
             case "A*":
                 solucion = piezas.BuscaAsterisco(nodoRaizClonado);
+                break;
+            case "BusquedaProfundidadAcotada":
+                solucion = piezas.BusquedaProfundidadAcotada(nodoRaizClonado, LIMITE_MAXIMO_PROFUNDIDAD_ITERATIVA);
+                break;
+            case "Voraz":
+                solucion = piezas.BusquedaVoraz(nodoRaizClonado);
                 break;
             default:
                 pasoTexto.text = "Error: Tipo de búsqueda no reconocido.";
@@ -326,7 +332,13 @@ public void OnClick_BusquedaAnchura()
     public void OnClick_ProfundidadIterativa()
     {
         StopAllCoroutines();
-        //StartCoroutine(BusquedaProfundidadIterativaCoroutine(estadoActual));
+        IniciarBusqueda(estadoActual, "BusquedaProfundidadAcotada");
     }
-  
+
+    public void OnClick_Voraz()
+    {
+        StopAllCoroutines();
+        IniciarBusqueda(estadoActual, "Voraz");
     }
+
+}

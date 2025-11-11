@@ -121,7 +121,7 @@ public class Piezas
 
         while (Abiertos.Count > 0 && !encontrado)
         {
-            // CAMBIOS CLAVE PARA DFS (PILA/STACK):
+           
             int ultimoIndice = Abiertos.Count - 1;
             Nodo actual = Abiertos[ultimoIndice]; //cogemos el último elemento (LIFO)
             Abiertos.RemoveAt(ultimoIndice);      //eliminamos el último elemento (Pop)
@@ -181,14 +181,14 @@ public class Piezas
 
         while (Abiertos.Count > 0 && !encontrado)
         {
-            // Lógica de Pila (Stack / LIFO) para Profundidad
+            
             int ultimoIndice = Abiertos.Count - 1;
             Nodo actual = Abiertos[ultimoIndice];
             Abiertos.RemoveAt(ultimoIndice);
 
             Cerrados.Add(actual); // ya visitamos este nodo
 
-            // 1. COMPROBACIÓN DE META
+  
             if (actual.EsMeta())
             {
                 UnityEngine.Debug.Log("¡Hemos encontrado el nodo solución!");
@@ -197,8 +197,7 @@ public class Piezas
                 return CaminoSolucion;
             }
 
-            // 2. COMPROBACIÓN DEL LÍMITE DE PROFUNDIDAD
-            // Solo expandimos si el costo (profundidad) del nodo actual es menor que el límite.
+          
             if (actual.Costo < limite)
             {
                 // Expandimos el nodo actual
@@ -242,13 +241,13 @@ public class Piezas
 
     // Inicializar el nodo raíz
     root.Costo = 0;
-    root.calculaMalColocadas(); // Calcular h(n) inicial
+    root.calculaManhattan(); // Calcular h(n) inicial
     Abiertos.Add(root);
 
         while (Abiertos.Count > 0 && !encontrado)
         {
 
-            Abiertos = Abiertos.OrderBy(n => n.Costo + n.Heuristica).ToList();//Ordenamos por coste+heurística
+            Abiertos = Abiertos.OrderBy(n => n.Costo + n.Heuristica).ToList();//Ordenamos por coste+heurística. 
 
             // Cogemos el menor
             Nodo actual = Abiertos[0];
@@ -274,7 +273,7 @@ public class Piezas
                 hijoActual.Costo = actual.Costo + 1;
 
                 //Calcular Heurística (h(n)): Piezas mal colocadas
-                hijoActual.calculaMalColocadas();
+                hijoActual.calculaManhattan();
 
 
                 if (!Contiene(Abiertos, hijoActual) && !Contiene(Cerrados, hijoActual))
@@ -286,19 +285,75 @@ public class Piezas
         }//while
         return null;
     }//BuscaAsterisco
-    
+
+
+    /// <summary>
+    /// Búsqueda Voraz (Greedy Search)
+    /// Ordena los abiertos solo por la Heurística (h(n)), ignora el Costo (g(n)).
+    /// </summary>
+    public List<Nodo> BusquedaVoraz(Nodo root)
+    {
+        List<Nodo> Abiertos = new List<Nodo>(); // Nodos por visitar (Cola de Prioridad simulada)
+        List<Nodo> Cerrados = new List<Nodo>(); // Nodos visitados
+        List<Nodo> CaminoSolucion = new List<Nodo>();
+        bool encontrado = false;
+
+        // Inicializar el nodo raíz
+        root.Costo = 0;
+        root.calculaManhattan(); // *** Usamos Manhattan ***
+        Abiertos.Add(root);
+
+        while (Abiertos.Count > 0 && !encontrado)
+        {
+            // *** CAMBIO CLAVE: Ordenamos solo por Heuristica (h(n)) ***
+            // La Voraz solo se fija en la proximidad a la meta, no en el costo del camino
+            Abiertos = Abiertos.OrderBy(n => n.Heuristica).ToList();//----------- nos fijamos solamente en la heurística
+
+            // Cogemos el menor
+            Nodo actual = Abiertos[0];
+            Abiertos.RemoveAt(0);
+
+            if (actual.EsMeta())
+            {
+                Debug.Log("¡Solución Voraz encontrada!");
+                Trazo(CaminoSolucion, actual);
+                return CaminoSolucion;
+            }
+
+            Cerrados.Add(actual); // Marcar como visitado
+
+            actual.Expandir();
+            for (int i = 0; i < actual.hijos.Count; i++)
+            {
+                Nodo hijoActual = actual.hijos[i];
+
+                // Asignar Coste (g(n)): Profundidad 
+                hijoActual.Costo = actual.Costo + 1;
+
+                // Calcular Heurística (h(n))
+                hijoActual.calculaManhattan(); // *** Usamos Manhattan ***
+
+                if (!Contiene(Abiertos, hijoActual) && !Contiene(Cerrados, hijoActual))
+                {
+                    Abiertos.Add(hijoActual);
+                }
+            }//for
+        }//while
+        return null;
+    }//BusquedaVoraz
+
 
 
 
 
     //////////////////////////////
 
-/// <summary>
-/// ///////
-/// </summary>
-/// <param name="lista"></param>
-/// <param name="hijoActual"></param>
-/// <returns></returns>
+    /// <summary>
+    /// ///////
+    /// </summary>
+    /// <param name="lista"></param>
+    /// <param name="hijoActual"></param>
+    /// <returns></returns>
     private bool Contiene(List<Nodo> lista,Nodo hijoActual)
     {
         /*   for (int i = 0; i < lista.Count; i++)
